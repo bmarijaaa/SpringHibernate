@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xsi:schemaLocation="
+			http://www.springframework.org/schema/beans
+	    	http://www.springframework.org/schema/beans/spring-beans.xsd
+	    	http://www.springframework.org/schema/context
+	    	http://www.springframework.org/schema/context/spring-context.xsd
+	    	http://www.springframework.org/schema/mvc
+	        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+	        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+        >
+	
+	<context:component-scan base-package="heroj"/>
+	<context:annotation-config/>
+	<context:property-placeholder
+    location=" classpath:bazakonfiguracija.properties,
+    		   classpath:heroj.properties,"
+    ignore-unresolvable="true"/>
+	
+    <!-- DataSource configuration -->
+    <bean id = "dataSource" class = "org.springframework.jdbc.datasource.DriverManagerDataSource">
+    	<property name = "driverClassName" value = "${baza.driver}"/>
+	   	<property name = "url" value = "${baza.url}"/>
+	   	<property name = "username" value = "${baza.username}"/>
+	   	<property name = "password" value = "${baza.password}"/>
+    </bean>
+   
+    <!-- Hibarnate configuration Session Factory -->
+    <bean id = "sessionFactory" class = "org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+   		<property name = "dataSource" ref = "dataSource"/>
+   		<property name="packagesToScan" value = "heroj"/>
+   		<property name = "hibernateProperties" >
+   		  <props>
+   		    <prop key = "dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+   		    <prop key = "hibernate.show_sql">true</prop>
+   		    <prop key="hibernate.hbm2ddl.auto">update</prop>
+   		  </props>
+   		</property>
+   </bean>
+   
+     <!-- Hibernate transaction mager setup -->
+   <bean id = "transactionManager" class = "org.springframework.orm.hibernate5.HibernateTransactionManager">
+   	<property name="sessionFactory" ref = "sessionFactory"/>
+   </bean>
+   
+	<!-- Annotation @Transactional is now available -->
+	<tx:annotation-driven transaction-manager = "transactionManager"/>
+   
+<!--    <bean id = "superHeroj" class="heroj.SuperHeroj">
+   		<property name="ime" value="${ime.heroja}"/>
+   		<property name="magija" value="${magija.heroja}"/>
+   </bean> -->
+    
+
+</beans>
